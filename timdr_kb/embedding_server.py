@@ -1,4 +1,4 @@
-"""Local-only compatible embedding API. No cloud costs; never expose directly to internet.
+r"""Local-only compatible embedding API. No cloud costs; never expose directly to internet.
 
 Usage:
   $env:TIMDR_EMBEDDING_TOKEN = Read-Host "Local API token"

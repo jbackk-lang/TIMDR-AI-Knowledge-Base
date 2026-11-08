@@ -1,0 +1,47 @@
+name: Build knowledge vector index
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "knowledge/**"
+      - "timdr_kb/**"
+      - "requirements.txt"
+      - ".github/workflows/build-index.yml"
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Start Qdrant
+        run: |
+          docker run -d --name qdrant -p 127.0.0.1:6333:6333 -v "$PWD/qdrant_data:/qdrant/storage" qdrant/qdrant:v1.15.5
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:6333/healthz && break; sleep 2; done
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Index committed seed corpus
+        run: python -m timdr_kb.seed
+      - name: Create Qdrant snapshot
+        run: |
+          curl -fsS -X POST http://127.0.0.1:6333/collections/timdr_unified_v1/snapshots -o snapshot-response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          obj=json.loads(Path("snapshot-response.json").read_text())
+          assert obj["status"]=="ok", obj
+          Path("snapshot-name.txt").write_text(obj["result"]["name"])
+          PY
+          mkdir -p artifacts
+          cp snapshot-response.json artifacts/
+          name=$(cat snapshot-name.txt)
+          curl -fsS "http://127.0.0.1:6333/collections/timdr_unified_v1/snapshots/$name" -o "artifacts/$name"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timdr-qdrant-seed-snapshot
+          path: artifacts/
+          retention-days: 30

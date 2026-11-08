@@ -1,0 +1,12 @@
+name = "timdr-public-search"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+# Cloudflare Rate Limiting binding. Configure a strict free-tier-compatible policy.
+# See Cloudflare Workers Rate Limiting documentation for plan-specific quotas.
+[[unsafe.bindings]]
+name = "SEARCH_LIMITER"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

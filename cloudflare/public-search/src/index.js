@@ -25,7 +25,7 @@ export default {
     if (origin !== ORIGIN) return reply({ error: "Origin not allowed" }, 403);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
     if (request.method !== "POST") return reply({ error: "Method not allowed" }, 405);
-    if (!env.TIMDR_SEARCH_TOKEN || !env.SEARCH_LIMITER) return reply({ error: "Gateway not configured" }, 503);
+    if (!env.TIMDR_SEARCH_TOKEN || !env.SEARCH_LIMITER || !env.EMBEDDING_URL || !env.EMBEDDING_TOKEN) return reply({ error: "Gateway not configured" }, 503);
     if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json"))
       return reply({ error: "Expected JSON" }, 415);
     const size = Number(request.headers.get("content-length") || 0);
@@ -47,10 +47,10 @@ export default {
     const timer = setTimeout(() => controller.abort(), 12000);
     try {
       // Fixed upstream; no user-supplied URL or arbitrary proxying.
-      const upstream = await fetch(UPSTREAM, {
+      const embeddingUrl = new URL(env.EMBEDDING_URL);\n      if (embeddingUrl.protocol !== "https:") return reply({ error: "Embedding service misconfigured" }, 503);\n      const embeddingResponse = await fetch(embeddingUrl.href, {\n        method: "POST",\n        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.EMBEDDING_TOKEN },\n        body: JSON.stringify({ text: query.trim(), model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" }),\n        signal: controller.signal\n      });\n      if (!embeddingResponse.ok) return reply({ error: "Embedding service unavailable" }, 502);\n      const embedded = await embeddingResponse.json();\n      const vector = embedded.vector;\n      if (!Array.isArray(vector) || vector.length !== 384 || !vector.every(n => typeof n === "number" && Number.isFinite(n)))\n        return reply({ error: "Embedding response invalid" }, 502);\n      const upstream = await fetch(UPSTREAM, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.TIMDR_SEARCH_TOKEN },
-        body: JSON.stringify({ query: query.trim(), limit: 5 }),
+        body: JSON.stringify({ vector, topK: 5, filter: {} }),
         signal: controller.signal
       });
       if (!upstream.ok) return reply({ error: "Search service unavailable" }, 502);

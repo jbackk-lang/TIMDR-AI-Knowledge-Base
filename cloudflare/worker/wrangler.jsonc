@@ -1,0 +1,9 @@
+{
+  "name": "timdr-vector-search",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "vectorize": [
+    { "binding": "VECTORIZE", "index_name": "timdr-unified-v1" }
+  ]
+}

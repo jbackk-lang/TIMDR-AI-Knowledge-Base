@@ -1,5 +1,10 @@
 # TIMDR AI Knowledge Base
 
+<!-- TIMDR HUB LINKS -->
+> **TIMDR — nawigacja:** [Knowledge Hub — dokumentacja i wyszukiwarka](https://jbackk-lang.github.io/TIMDR-AI-Knowledge-Base/) · [Panel badawczy i katalog repozytoriów](https://jbackk-lang.github.io/) · [GIA-TIMDR — źródła](https://github.com/jbackk-lang/GIA-TIMDR) · [Research AI — kod i uruchomienie lokalne](https://github.com/jbackk-lang/TIMDR-AI-Knowledge-Base). Publiczna wyszukiwarka Huba jest tekstowa; wyszukiwanie semantyczne działa lokalnie.
+<!-- /TIMDR HUB LINKS -->
+
+
 Public source catalog and protected semantic knowledge index for the GIA-TIMDR research and engineering ecosystem.
 
 **Start here:** [TIMDR Knowledge Hub (static page source)](docs/index.html) · [Discover and publish](docs/DISCOVERY.md) · [AI source catalog](docs/llms.txt)

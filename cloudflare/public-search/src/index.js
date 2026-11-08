@@ -4,7 +4,6 @@
  * Never expose TIMDR_SEARCH_TOKEN in GitHub Pages or browser JavaScript.
  */
 const ORIGIN = "https://jbackk-lang.github.io";
-const PAGE = "/TIMDR-AI-Knowledge-Base/";
 const UPSTREAM = "https://timdr-vector-search.jbackk.workers.dev/search";
 const headers = {
   "Access-Control-Allow-Origin": ORIGIN,
@@ -47,7 +46,20 @@ export default {
     const timer = setTimeout(() => controller.abort(), 12000);
     try {
       // Fixed upstream; no user-supplied URL or arbitrary proxying.
-      const embeddingUrl = new URL(env.EMBEDDING_URL);\n      if (embeddingUrl.protocol !== "https:") return reply({ error: "Embedding service misconfigured" }, 503);\n      const embeddingResponse = await fetch(embeddingUrl.href, {\n        method: "POST",\n        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.EMBEDDING_TOKEN },\n        body: JSON.stringify({ text: query.trim(), model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" }),\n        signal: controller.signal\n      });\n      if (!embeddingResponse.ok) return reply({ error: "Embedding service unavailable" }, 502);\n      const embedded = await embeddingResponse.json();\n      const vector = embedded.vector;\n      if (!Array.isArray(vector) || vector.length !== 384 || !vector.every(n => typeof n === "number" && Number.isFinite(n)))\n        return reply({ error: "Embedding response invalid" }, 502);\n      const upstream = await fetch(UPSTREAM, {
+      const embeddingUrl = new URL(env.EMBEDDING_URL);
+      if (embeddingUrl.protocol !== "https:") return reply({ error: "Embedding service misconfigured" }, 503);
+      const embeddingResponse = await fetch(embeddingUrl.href, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.EMBEDDING_TOKEN },
+        body: JSON.stringify({ text: query.trim(), model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" }),
+        signal: controller.signal
+      });
+      if (!embeddingResponse.ok) return reply({ error: "Embedding service unavailable" }, 502);
+      const embedded = await embeddingResponse.json();
+      const vector = embedded.vector;
+      if (!Array.isArray(vector) || vector.length !== 384 || !vector.every(n => typeof n === "number" && Number.isFinite(n)))
+        return reply({ error: "Embedding response invalid" }, 502);
+      const upstream = await fetch(UPSTREAM, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.TIMDR_SEARCH_TOKEN },
         body: JSON.stringify({ vector, topK: 5, filter: {} }),

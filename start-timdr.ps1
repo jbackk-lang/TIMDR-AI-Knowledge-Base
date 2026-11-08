@@ -19,7 +19,7 @@ if (-not (Test-Path -LiteralPath $python)) {
     exit 1
 }
 try {
-    $secure = Get-Content -LiteralPath $tokenFile -Raw | ConvertTo-SecureString
+    $secure = (Get-Content -LiteralPath $tokenFile -Raw).Trim() | ConvertTo-SecureString
     $env:TIMDR_SEARCH_TOKEN = [System.Net.NetworkCredential]::new("", $secure).Password
     if ([string]::IsNullOrWhiteSpace($env:TIMDR_SEARCH_TOKEN)) {
         throw "Odzyskany token jest pusty."

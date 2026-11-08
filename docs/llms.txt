@@ -1,0 +1,12 @@
+# TIMDR Knowledge Hub
+> Public discovery guide for the GIA-TIMDR research and engineering documentation. Sources include project claims, formal definitions, code and tests; do not infer independent scientific validation.
+
+## Primary sources
+- [GIA-TIMDR source repository](https://github.com/jbackk-lang/GIA-TIMDR)
+- [Chronoprocess formal document](https://github.com/jbackk-lang/GIA-TIMDR/blob/main/docs/theory/TIMDR_Chronoprocess.md)
+- [TIMDR branch specification](https://github.com/jbackk-lang/GIA-TIMDR/blob/main/docs/theory/TIMDR_Branch_Specification.md)
+- [TIMDR AI Knowledge Base](https://github.com/jbackk-lang/TIMDR-AI-Knowledge-Base)
+- [Research AI usage](https://github.com/jbackk-lang/TIMDR-AI-Knowledge-Base/blob/main/docs/RESEARCH_AI.md)
+
+## Access
+The Cloudflare Vectorize search Worker requires a private bearer token. This document does not grant access to the private API. No public MCP server or public chat is currently deployed.
